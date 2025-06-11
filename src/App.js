@@ -10,6 +10,11 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+// Define the base URL for your backend API
+// process.env.REACT_APP_API_URL will be replaced by Vercel at build time
+// with the actual URL you set in your Vercel environment variables.
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 function App() {
   const [resumes, setResumes] = useState([]);
   const [jobDescription, setJobDescription] = useState('');
@@ -32,11 +37,18 @@ function App() {
     formData.append('job_description', jobDescription);
 
     try {
-      const response = await axios.post('${process.env.REACT_APP_API_URL}', formData);
+      // CORRECTED LINE: Use backticks (`) for template literals
+      // and append the '/analyze' endpoint as your Flask route is '/analyze'
+      const response = await axios.post(`${API_BASE_URL}/analyze`, formData, {
+          headers: {
+              'Content-Type': 'multipart/form-data' // Axios handles this for FormData, but good to be explicit
+          }
+      });
       setResults(response.data.results);
     } catch (error) {
       console.error('Error:', error);
-      alert('Something went wrong. Please try again.');
+      // More descriptive error message for the user if possible
+      alert('Something went wrong during analysis. Please try again.');
     }
   };
 
